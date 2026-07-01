@@ -1,12 +1,6 @@
 import { Button, Column, Hr, Img, Row, Text } from '@react-email/components';
 import { BaseLayout, emailButton, emailText } from './BaseLayout';
-
-export function formatEur(cents: number): string {
-  return `€${(cents / 100).toLocaleString('en-IE', {
-    minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
+import { formatEur } from '@/lib/money';
 
 export interface OrderEmailItem {
   brand: string;
