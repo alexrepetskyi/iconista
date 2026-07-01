@@ -1,0 +1,206 @@
+{
+  "ticker": {
+    "liveNow": "Drop {number} — live now",
+    "piecesOnly": "{count} pieces only",
+    "authentic": "100% authentic — guaranteed",
+    "shipping": "Free insured EU shipping"
+  },
+  "nav": {
+    "thisDrop": "This Drop",
+    "archive": "Archive",
+    "about": "About us",
+    "account": "Account",
+    "admin": "Admin",
+    "cart": "Cart",
+    "signIn": "Sign in",
+    "signOut": "Sign out"
+  },
+  "hero": {
+    "liveNow": "Live now · {count} pieces",
+    "drop": "Drop",
+    "description": "Six authenticated icons, released together. When they're gone, the drop closes — the next opens Friday.",
+    "shopTheDrop": "Shop the drop",
+    "remindMe": "Remind me — Drop {number}",
+    "scroll": "Scroll",
+    "comingSoon": "The next drop is being curated. Leave your email below — one email per drop, nothing else."
+  },
+  "drop": {
+    "released": "Released {date}",
+    "live": "Live",
+    "closed": "Closed",
+    "closesIn": "Drop closes in",
+    "days": "days",
+    "hrs": "hrs",
+    "min": "min",
+    "sec": "sec",
+    "stillAvailable": "{available} of {total} still available",
+    "save": "Save {amount}",
+    "soldOut": "Sold out",
+    "onHold": "On hold",
+    "orderNow": "Order now",
+    "viewPiece": "View piece"
+  },
+  "authenticity": {
+    "headline": "All our products are <em>authentic</em>, verified before they're listed.",
+    "body": "We buy every piece ourselves and inspect it by hand before it enters a drop. Each order ships insured, with its authenticity documentation."
+  },
+  "about": {
+    "label": "About us",
+    "title": "Two of us.",
+    "subtitle": "Every piece, chosen by hand.",
+    "body": "ICONISTA is a two-person house — a husband and wife who hunt for luxury pieces across Europe. She curates every drop herself: a handful of pieces, each one bought, inspected and photographed by us personally. No warehouse, no endless catalogue — just what we would carry ourselves, at prices below the boutique.",
+    "piecesPerDrop": "Pieces per drop",
+    "oneOfEach": "One of each, never restocked",
+    "authenticDocumented": "Authentic, documented",
+    "photoCaption": "Somewhere between Paris & Milan"
+  },
+  "archive": {
+    "label": "Sold out — gone for good",
+    "title": "The Archive",
+    "description": "Every past drop, on record. Each piece was one-of-one — once a drop closes it never returns.",
+    "soldOut": "Sold out",
+    "pieces": "{count} pieces",
+    "viewAll": "View all {count} past drops"
+  },
+  "reviews": {
+    "title": "Our customers say it better",
+    "excellent": "Excellent",
+    "fromPastDrops": "from past drops"
+  },
+  "faq": {
+    "title": "FAQ",
+    "subtitle": "Customer service is online Mon–Sat, 10:00–19:00. Still unsure? Reach us on WhatsApp.",
+    "q1": "Which countries do you ship to?",
+    "a1": "We ship to all EU countries, fully insured and free of charge. Delivery takes 2–6 working days.",
+    "q2": "How do I know products are authentic?",
+    "a2": "Every piece is bought and inspected by us personally before it enters a drop, and ships with its authenticity documentation.",
+    "q3": "How long does shipping take?",
+    "a3": "2–6 working days within the EU. Every order ships insured with tracking.",
+    "q4": "How can I make a return?",
+    "a4": "You have 14 days from the delivery date. Contact us and we'll arrange the insured return shipment."
+  },
+  "benefits": {
+    "shippingTitle": "Free shipping",
+    "shippingBody": "Always free on every order, 2–6 working days",
+    "serviceTitle": "Customer service",
+    "serviceBody": "Reach us anytime on WhatsApp",
+    "returnsTitle": "Guaranteed returns",
+    "returnsBody": "14 days from the delivery date",
+    "paymentsTitle": "Secure payments",
+    "paymentsBody": "Cards, PayPal, Klarna, Scalapay"
+  },
+  "newsletter": {
+    "label": "Drop {number}",
+    "title": "Be first when the <b>next drop</b> goes live",
+    "subtitle": "One email per drop. Nothing else, ever.",
+    "emailPlaceholder": "Email address",
+    "notifyMe": "Notify me",
+    "confirmSent": "Check your inbox — click the link to confirm your subscription.",
+    "confirmed": "You're on the list. See you at the next drop.",
+    "unsubscribed": "You've been unsubscribed.",
+    "invalidEmail": "Please enter a valid email address.",
+    "tooMany": "Too many attempts — try again in a minute."
+  },
+  "footer": {
+    "tagline": "Small drops of authentic luxury pieces, hand-picked by the two of us — at prices below the boutique.",
+    "drops": "Drops",
+    "thisDrop": "This drop",
+    "theArchive": "The Archive",
+    "nextDropReminder": "Next drop reminder",
+    "house": "House",
+    "aboutUs": "About us",
+    "authentication": "Authentication",
+    "reviews": "Reviews",
+    "care": "Care",
+    "shipping": "Shipping",
+    "returns": "Returns",
+    "privacy": "Privacy",
+    "contact": "Contact",
+    "copyright": "© {year} ICONISTA — EU · VAT 13028390014"
+  },
+  "product": {
+    "backToDrop": "Back to drop",
+    "addToCart": "Add to cart",
+    "buyNow": "Buy now",
+    "inCart": "In your cart",
+    "soldOut": "Sold out",
+    "onHold": "On hold — someone is completing this purchase",
+    "authenticity": "Ships insured with authenticity documentation",
+    "save": "Save {amount}"
+  },
+  "cart": {
+    "title": "Your cart",
+    "empty": "Your cart is empty.",
+    "backToShop": "Back to the drop",
+    "remove": "Remove",
+    "subtotal": "Subtotal",
+    "checkout": "Proceed to payment",
+    "soldNotice": "{title} was just taken — it has been removed from your cart.",
+    "itemUnavailable": "No longer available"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "orderSummary": "Order summary",
+    "promoLabel": "Promo code",
+    "promoPlaceholder": "Enter promo code",
+    "promoApply": "Apply",
+    "promoRemove": "Remove",
+    "promoDiscount": "Promo {code}",
+    "promoInvalid": "This code is not valid.",
+    "promoExpired": "This code has expired.",
+    "promoUsed": "This code has already been used.",
+    "promoWrongAccount": "This code is not valid for this account.",
+    "promoNeedSignIn": "Sign in to use this code.",
+    "promoInUse": "This code is being used in another checkout right now.",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "itemsTaken": "Some pieces were just taken: {titles}. You can pay for the rest.",
+    "payForRest": "Pay for the rest",
+    "reservationExpired": "Your reservation expired.",
+    "reserveAgain": "Reserve again",
+    "reservedFor": "Pieces are reserved for you for {minutes} minutes.",
+    "success": "Thank you — your order is confirmed. A confirmation email is on its way.",
+    "successTitle": "Order confirmed",
+    "viewOrders": "View your orders",
+    "allTaken": "These pieces are no longer available."
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "registerTitle": "Create account",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "signIn": "Sign in",
+    "register": "Create account",
+    "withGoogle": "Continue with Google",
+    "or": "or",
+    "noAccount": "No account yet?",
+    "haveAccount": "Already have an account?",
+    "invalidCredentials": "Wrong email or password.",
+    "emailTaken": "An account with this email already exists.",
+    "weakPassword": "Password must be at least 8 characters.",
+    "tooMany": "Too many attempts — try again in a minute.",
+    "verifySent": "We sent you a confirmation email.",
+    "verified": "Email confirmed."
+  },
+  "account": {
+    "title": "Your orders",
+    "noOrders": "No orders yet.",
+    "order": "Order",
+    "status": {
+      "pending": "Pending payment",
+      "paid": "Paid",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    },
+    "tracking": "Tracking",
+    "total": "Total",
+    "discount": "Discount"
+  },
+  "meta": {
+    "title": "ICONISTA — authentic luxury drops",
+    "description": "Small drops of authentic luxury pieces, hand-picked — at prices below the boutique."
+  }
+}
