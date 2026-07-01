@@ -30,6 +30,7 @@ const orderSchema = new Schema(
       index: true,
     },
     stripeSessionId: { type: String, unique: true, sparse: true },
+    paymentIntentId: { type: String, index: true, sparse: true },
     shippingAddress: { type: Schema.Types.Mixed },
     trackingNumber: { type: String },
     timeline: {
