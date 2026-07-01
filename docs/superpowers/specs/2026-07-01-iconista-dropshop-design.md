@@ -41,7 +41,7 @@ iconista/
 │   │   │   │   └── checkout/page.tsx     # Stripe Embedded Checkout
 │   │   │   ├── (auth)/                   # login, register (own layout)
 │   │   │   ├── account/orders/page.tsx   # order history (signed-in only)
-│   │   │   └── admin/                    # drops / products / orders (role=admin)
+│   │   │   └── admin/                    # drops / products / orders / promocodes (role=admin)
 │   │   └── api/
 │   │       ├── auth/[...nextauth]/route.ts
 │   │       └── webhooks/stripe/route.ts
@@ -52,8 +52,9 @@ iconista/
 │   │   ├── checkout/
 │   │   │   └── reservation.ts            # 1/1 reservation logic (Redis)
 │   │   ├── orders/
+│   │   ├── promocodes/                   # generate, validate, hold, consume
 │   │   ├── auth/
-│   │   ├── newsletter/
+│   │   ├── newsletter/                   # double opt-in + unsubscribe
 │   │   └── translations/
 │   │       └── translate.ts              # LLM translation on admin save + backfill
 │   ├── components/                       # shared UI: Button, Ticker, Countdown, Badge...
@@ -88,8 +89,9 @@ Content fields (title, description, ...) are per-locale maps: `Map<locale, strin
 - **drops** — number (007), title*, slug, status (`draft` → `live` → `closed`), releaseAt, closesAt, heroVideoUrl
 - **products** — dropId, brand, title*, slug, description*, price, compareAtPrice (SAVE badge), images[], status (`available` | `sold`)
 - **carts** — userId or anonymous sessionId (cookie), items[]
-- **orders** — userId (optional — guest checkout allowed), items with price captured at purchase, total, currency, status (`pending` → `paid` → `shipped` → `delivered`, or `cancelled`), stripeSessionId, shippingAddress (from Stripe), timeline
-- **subscribers** — email + locale for the "next drop" broadcast
+- **orders** — userId (optional — guest checkout allowed), items with price captured at purchase, subtotal, promoCode + discount amount (if applied), total, currency, status (`pending` → `paid` → `shipped` → `delivered`, or `cancelled` / `refunded`), stripeSessionId, shippingAddress (from Stripe), timeline
+- **subscribers** — email + locale for the "next drop" broadcast, double opt-in state (`pending` → `confirmed`), unsubscribe token
+- **promocodes** — code (unique, uppercase), discount (`percent` | `fixed` + value), expiresAt, userId (optional — restricts the code to one account), status (`active` | `used` | `expired`), usedBy/usedAt, orderId. Single-use: one successful redemption consumes the code.
 
 (* = per-locale map)
 
@@ -126,7 +128,9 @@ Everything derives from it:
 Products are one-of-one; two buyers must never pay for the same piece.
 
 - Adding to cart does **not** reserve.
-- Starting checkout reserves every cart item atomically: `SET reserve:product:<id> <ownerId> NX EX 1800` (30 min, matching the Stripe session lifetime). If any item fails to reserve → checkout refused with a clear "just sold/reserved" message and the cart refreshes.
+- Starting checkout reserves every cart item atomically: `SET reserve:product:<id> <ownerId> NX EX 1800` (30 min, matching the Stripe session lifetime).
+- **Partial reservation failure:** if some items reserve and others don't, checkout is NOT refused wholesale — the UI names the lost pieces ("Jackie 1961 was just taken") and offers one-click "pay for the rest"; already-taken reservations are kept.
+- **Reserved is visible to everyone:** product cards and the product page show an "ON HOLD" state while a reservation key exists (storefront checks Redis alongside Mongo status). No dead-end checkouts for the second buyer.
 - A product is available ⇔ Mongo status is `available` **and** no Redis reservation key exists.
 - Reservations expire via TTL — no cron.
 - Mongo is the source of truth: a product becomes `sold` only via the Stripe webhook.
@@ -134,9 +138,26 @@ Products are one-of-one; two buyers must never pay for the same piece.
 ### Checkout & payment
 
 - Cart → "Pay" (or product page → "Buy now" with a single item) → reserve items → create Stripe Checkout Session (embedded UI mode, 30 min expiry, shipping address collected by Stripe) → embedded payment form on `/checkout`.
-- Webhook `checkout.session.completed` → order `paid`, products `sold`, reservation keys deleted, drop cache invalidated, confirmation email sent.
-- Webhook `checkout.session.expired` → reservation keys deleted, pending order `cancelled`.
+- **"Buy now" for an item already in the cart** never duplicates — it starts a single-item checkout for that piece, leaving the cart untouched.
+- **Drop close vs. active payments:** an active reservation outlives the drop's countdown — payment completes normally after the timer hits zero. A drop only transitions to `closed` when no live reservations/Stripe sessions remain for its products.
+- **Expired checkout page:** returning to `/checkout` after the session expired shows "reservation expired" with a one-click re-reserve + new session (if the items are still available).
+- Webhook `checkout.session.completed` → order `paid`, products `sold`, reservation keys deleted, promo code (if any) marked `used`, drop cache invalidated, confirmation email sent.
+- Webhook `checkout.session.expired` → reservation keys deleted, promo-code hold released, pending order `cancelled`.
 - Webhook handler verifies Stripe signatures and is idempotent (safe on Stripe retries).
+
+### Promo codes
+
+- Admin generates codes in `/admin/promocodes`: discount type (`percent` or `fixed` EUR amount), **expiry date**, optional **account binding** (code works only for that user's email), always **single-use**.
+- The checkout page always shows a promo-code input. Applying a valid code immediately updates the order summary — subtotal, discount line ("PROMO −€X"), new total — and the Stripe payment form charges the discounted total. The discount and code are stored on the order.
+- Validation on apply: code exists, `active`, not expired, bound account matches the signed-in user (bound codes require sign-in), not already used or held by another live checkout. Invalid → clear inline error ("expired", "already used", "not valid for this account").
+- Applying a code places a Redis hold (`SET promo:<code> <ownerId> NX EX 1800`, same lifetime as the reservation) so one code can't ride two concurrent checkouts; the discount is passed to Stripe via an ad-hoc coupon on the Checkout Session.
+- The code is consumed (`used`, with usedBy/usedAt/orderId) only on `checkout.session.completed`; an expired session releases the hold and the code stays usable.
+- Expiry is checked at validation time; a periodic status flip is unnecessary.
+
+### Refunds / returns (14-day promise in the design)
+
+- MVP: the refund itself is executed in the Stripe dashboard; the webhook (`charge.refunded`) moves the order to `refunded` and sends a confirmation email.
+- A refunded 1/1 piece does **not** auto-return to sale (its drop is closed). It stays `sold` with an admin note; the admin decides manually whether to attach it to a future drop.
 
 ### Auth
 
@@ -144,23 +165,32 @@ Products are one-of-one; two buyers must never pay for the same piece.
 - JWT sessions in httpOnly cookies; SSR pages read the session server-side.
 - Guest cart lives under an anonymous cookie; merged into the user cart on login.
 - Guest checkout allowed — the order is linked by the email Stripe collects.
+- **Guest orders join the account later:** on registration or login, past guest orders with the same (verified) email are attached to the account and appear in order history.
+- **Email verification never blocks buying:** an unverified account can check out normally (Stripe confirms the email in practice); verification is only required for password reset.
 - `/account` shows order history; `/admin` requires role `admin`.
 
 ### Admin
 
 - Create drop (number, title, release/close dates, hero video) → add products (photos, brand, title, prices; translations auto-generate on save) → publish (`live`; closes on timer or manually).
 - Orders list with status transitions; "mark shipped" (with tracking number) sends the shipping email.
+- Promo codes page: generate/list codes with discount, expiry, optional account binding, usage status.
 - Photo uploads stored in `uploads/` for MVP behind a single storage function — S3/R2 is a drop-in later.
+
+### Newsletter (GDPR)
+
+- "Notify me" signup uses **double opt-in**: signup → confirmation email → `confirmed` only after the click; broadcasts go to confirmed subscribers only.
+- Every broadcast includes a one-click unsubscribe link (tokenized, no login needed).
 
 ### Emails (Resend + React Email)
 
-Registration confirmation, password reset, order confirmation, order shipped (with tracking), "new drop is live" broadcast to subscribers.
+Registration confirmation, password reset, order confirmation, order shipped (with tracking), order refunded, newsletter opt-in confirmation, "new drop is live" broadcast to confirmed subscribers.
 
 ### Redis usage summary
 
 1. Product reservations (TTL keys, atomic NX).
-2. Rate limiting: login attempts and newsletter signups.
-3. Cache of the live drop payload, invalidated on sale/admin edits.
+2. Promo-code holds during checkout (TTL keys, atomic NX).
+3. Rate limiting: login attempts, newsletter signups, promo-code validation attempts (anti-bruteforce).
+4. Cache of the live drop payload, invalidated on sale/admin edits.
 
 ## Error handling
 
@@ -172,10 +202,10 @@ Registration confirmation, password reset, order confirmation, order shipped (wi
 
 ## Testing
 
-- **Unit (Vitest):** reservation logic (concurrent NX contention, expiry), order status transitions, cart merge on login, locale fallback when a translation is missing.
-- **Integration:** checkout flow against Stripe test mode with webhook fixtures (completed / expired); translation save path with a mocked LLM client.
-- **Smoke (Playwright):** home renders drop data, product page → add to cart → checkout page loads the payment form.
+- **Unit (Vitest):** reservation logic (concurrent NX contention, expiry, partial failure), promo-code validation matrix (expired / used / wrong account / concurrent hold) and discount math, order status transitions, cart merge on login, locale fallback when a translation is missing.
+- **Integration:** checkout flow against Stripe test mode with webhook fixtures (completed / expired / refunded), including a discounted session; translation save path with a mocked LLM client.
+- **Smoke (Playwright):** home renders drop data, product page → add to cart → checkout page loads the payment form and accepts a promo code.
 
 ## Out of scope (MVP)
 
-Search, PayPal/Scalapay as separate integrations (Stripe covers cards/Klarna), reviews CMS (static content initially), S3 image storage, inventory >1 per product, refunds UI (handled in Stripe dashboard).
+Search (the design's Search button is not rendered in MVP — no dead buttons), PayPal/Scalapay as separate integrations (Stripe covers cards/Klarna), reviews CMS (static content initially), S3 image storage, inventory >1 per product, refund execution UI (refunds are issued in the Stripe dashboard; the site reflects them via webhook).
