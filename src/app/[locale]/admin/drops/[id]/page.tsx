@@ -5,6 +5,7 @@ import { Product } from '@/models/Product';
 import { AdminForm, AdminButton } from '@/features/admin/components/AdminForm';
 import { AdminSplit, AdminPanel } from '@/features/admin/components/AdminSplit';
 import { RichTextEditor } from '@/features/admin/components/RichTextEditor';
+import { PhotoInputs } from '@/features/admin/components/PhotoInputs';
 import {
   createProduct,
   deleteProduct,
@@ -106,17 +107,12 @@ export default async function AdminDropDetailPage({
                   <input name="price" type="number" step="0.01" min="1" placeholder="Price €" className="field" required />
                   <input name="compareAtPrice" type="number" step="0.01" min="0" placeholder="Compare-at €" className="field" />
                 </div>
-                <label className="label-xs" style={{ color: 'var(--stone)' }}>
-                  Photos (stored on S3)
-                  <input
-                    name="images"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/avif"
-                    multiple
-                    className="field"
-                    style={{ marginTop: 6 }}
-                  />
-                </label>
+                <div>
+                  <div className="label-xs" style={{ color: 'var(--stone)', marginBottom: 6 }}>
+                    Photos (stored on S3)
+                  </div>
+                  <PhotoInputs />
+                </div>
               </AdminForm>
             ) : (
               <p className="form-error">This drop is full ({MAX_PIECES_PER_DROP} pieces).</p>

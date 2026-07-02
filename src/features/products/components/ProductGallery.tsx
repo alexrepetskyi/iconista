@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 /**
- * Product photo gallery: one large frame + a thumbnail rail.
- * Falls back to a quiet placeholder when the piece has no photos yet.
+ * Product photo slider: main frame with prev/next arrows, swipe and
+ * keyboard support, plus a thumbnail rail. image[0] is the main photo.
  */
 export function ProductGallery({
   images,
@@ -16,11 +16,51 @@ export function ProductGallery({
   badge?: string | null;
 }) {
   const [active, setActive] = useState(0);
+  const touchX = useRef<number | null>(null);
+  const count = images.length;
   const current = images[active] ?? null;
+
+  const go = (delta: number) => {
+    if (count < 2) return;
+    setActive((i) => (i + delta + count) % count);
+  };
+
+  const arrowStyle = (side: 'left' | 'right') =>
+    ({
+      position: 'absolute',
+      [side]: 10,
+      top: '50%',
+      transform: 'translateY(-50%)',
+      width: 38,
+      height: 38,
+      borderRadius: '50%',
+      background: 'rgba(243,237,226,0.9)',
+      color: 'var(--ink)',
+      fontSize: 18,
+      lineHeight: 1,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 2,
+    }) as const;
 
   return (
     <div>
       <div
+        tabIndex={count > 1 ? 0 : -1}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowLeft') go(-1);
+          if (e.key === 'ArrowRight') go(1);
+        }}
+        onTouchStart={(e) => {
+          touchX.current = e.touches[0].clientX;
+        }}
+        onTouchEnd={(e) => {
+          if (touchX.current === null) return;
+          const dx = e.changedTouches[0].clientX - touchX.current;
+          touchX.current = null;
+          if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+        }}
         style={{
           position: 'relative',
           aspectRatio: '4 / 5',
@@ -29,18 +69,22 @@ export function ProductGallery({
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden',
+          outline: 'none',
+          touchAction: 'pan-y',
         }}
       >
         {current ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
+            key={active}
             src={current}
-            alt={alt}
+            alt={`${alt} — ${active + 1}`}
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ) : (
           <span style={{ fontWeight: 200, fontSize: 14, color: 'var(--ink-32)' }}>{alt}</span>
         )}
+
         {badge ? (
           <span
             style={{
@@ -54,42 +98,47 @@ export function ProductGallery({
               background: 'var(--ink)',
               color: 'var(--cream)',
               padding: '6px 11px',
+              zIndex: 2,
             }}
           >
             {badge}
           </span>
         ) : null}
-        {images.length > 1 ? (
-          <span
-            className="label-xs"
-            style={{
-              position: 'absolute',
-              right: 14,
-              bottom: 12,
-              color: 'var(--cream)',
-              background: 'rgba(21,17,11,0.55)',
-              padding: '4px 9px',
-            }}
-          >
-            {active + 1} / {images.length}
-          </span>
+
+        {count > 1 ? (
+          <>
+            <button type="button" aria-label="Previous photo" onClick={() => go(-1)} style={arrowStyle('left')}>
+              ‹
+            </button>
+            <button type="button" aria-label="Next photo" onClick={() => go(1)} style={arrowStyle('right')}>
+              ›
+            </button>
+            <span
+              className="label-xs"
+              style={{
+                position: 'absolute',
+                right: 14,
+                bottom: 12,
+                color: 'var(--cream)',
+                background: 'rgba(21,17,11,0.55)',
+                padding: '4px 9px',
+                zIndex: 2,
+              }}
+            >
+              {active + 1} / {count}
+            </span>
+          </>
         ) : null}
       </div>
 
-      {images.length > 1 ? (
+      {count > 1 ? (
         <div
           className="scrollx"
-          style={{
-            display: 'flex',
-            gap: 10,
-            marginTop: 12,
-            overflowX: 'auto',
-            paddingBottom: 4,
-          }}
+          style={{ display: 'flex', gap: 10, marginTop: 12, overflowX: 'auto', paddingBottom: 4 }}
         >
           {images.map((image, i) => (
             <button
-              key={image}
+              key={i}
               type="button"
               onClick={() => setActive(i)}
               aria-label={`${alt} — photo ${i + 1}`}

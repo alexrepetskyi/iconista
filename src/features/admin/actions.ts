@@ -138,8 +138,13 @@ export async function createProduct(
     return { ok: false, error: `A drop holds at most ${MAX_PIECES_PER_DROP} pieces.` };
   }
 
+  // One input per photo: image_0 is the main photo, order follows the index.
+  const imageKeys = [...formData.keys()]
+    .filter((key) => /^image_\d+$/.test(key))
+    .sort((a, b) => Number(a.slice(6)) - Number(b.slice(6)));
   const images: string[] = [];
-  for (const file of formData.getAll('images')) {
+  for (const key of imageKeys) {
+    const file = formData.get(key);
     if (file instanceof File && file.size > 0) {
       try {
         images.push(await saveUpload(file));
