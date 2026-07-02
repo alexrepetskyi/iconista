@@ -19,6 +19,7 @@ export async function SiteHeader() {
 
   return (
     <header className="site-header">
+      <div className="site-header-inner">
       <nav className="site-nav" style={navStyle}>
         <Link href="/" style={{ fontWeight: 600 }}>
           {t('thisDrop')}
@@ -58,6 +59,7 @@ export async function SiteHeader() {
             <circle cx="17.6" cy="6.4" r="1.1" fill="currentColor" stroke="none" />
           </svg>
         </a>
+      </div>
       </div>
     </header>
   );

@@ -185,10 +185,11 @@ export default async function HomePage({
       {/* ---------- 100% AUTHENTIC ---------- */}
       <section
         id="authenticity"
+        style={{ background: 'var(--ink)', color: 'var(--cream)' }}
+      >
+      <div
         className="split container"
         style={{
-          background: 'var(--ink)',
-          color: 'var(--cream)',
           gap: 40,
           alignItems: 'center',
           paddingTop: 90,
@@ -217,6 +218,7 @@ export default async function HomePage({
             {tAuth('body')}
           </p>
         </div>
+      </div>
       </section>
 
       {/* ---------- ABOUT ---------- */}
@@ -471,14 +473,16 @@ export default async function HomePage({
       </section>
 
       {/* ---------- BENEFITS ---------- */}
-      <section
+      <section style={{ borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)' }}>
+      <div
+        className="container"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
           gap: 1,
           background: 'var(--line)',
-          borderTop: '1px solid var(--line)',
-          borderBottom: '1px solid var(--line)',
+          paddingLeft: 0,
+          paddingRight: 0,
         }}
       >
         {(
@@ -494,6 +498,7 @@ export default async function HomePage({
             <div style={{ fontSize: 12, fontWeight: 300, color: 'var(--stone)', marginTop: 8 }}>{body}</div>
           </div>
         ))}
+      </div>
       </section>
 
       {/* ---------- NEWSLETTER ---------- */}
