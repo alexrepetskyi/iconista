@@ -7,7 +7,9 @@ import { User } from '@/models/User';
 import { env } from '@/lib/env';
 import { linkGuestData } from './link-guest';
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+// Lazy config: env() is only read at request time, so `next build`
+// works without production secrets.
+export const { handlers, auth, signIn, signOut } = NextAuth(() => ({
   secret: env().AUTH_SECRET,
   session: { strategy: 'jwt' },
   pages: { signIn: '/login' },
@@ -69,7 +71,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session;
     },
   },
-});
+}));
 
 export type SessionUser = { id: string; email?: string | null; role?: string };
 

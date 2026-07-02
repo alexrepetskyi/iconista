@@ -9,7 +9,20 @@ import { rateLimit } from '@/lib/ratelimit';
 import { sendNewsletterConfirmEmail } from '@/features/emails/send';
 import type { Locale } from '@/i18n/locales';
 
-export type NewsletterResult = { ok: true } | { ok: false; error: 'invalidEmail' | 'tooMany' };
+export type NewsletterResult =
+  | { ok: true }
+  | { ok: false; error: 'invalidEmail' | 'tooMany' }
+  | null;
+
+/** useActionState wrapper so the form POSTs natively before hydration. */
+export async function subscribeAction(
+  _prev: NewsletterResult,
+  formData: FormData,
+): Promise<NewsletterResult> {
+  const { getLocale } = await import('next-intl/server');
+  const locale = (await getLocale()) as Locale;
+  return subscribe(String(formData.get('email') ?? ''), locale);
+}
 
 /** Double opt-in step 1: store as pending, send the confirmation email. */
 export async function subscribe(email: string, locale: Locale): Promise<NewsletterResult> {

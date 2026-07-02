@@ -16,14 +16,18 @@ const registerSchema = z.object({
   password: z.string().min(8),
 });
 
-export type AuthActionResult = { ok: true } | { ok: false; error: string };
+export type AuthActionResult = { ok: true } | { ok: false; error: string } | null;
 
 async function clientIp(): Promise<string> {
   const h = await headers();
   return h.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local';
 }
 
-export async function registerAction(formData: FormData): Promise<AuthActionResult> {
+/** useActionState signature — the form POSTs even before hydration. */
+export async function registerAction(
+  _prev: AuthActionResult,
+  formData: FormData,
+): Promise<AuthActionResult> {
   const parsed = registerSchema.safeParse({
     name: formData.get('name'),
     email: formData.get('email'),
@@ -59,7 +63,10 @@ export async function registerAction(formData: FormData): Promise<AuthActionResu
   return { ok: true };
 }
 
-export async function loginAction(formData: FormData): Promise<AuthActionResult> {
+export async function loginAction(
+  _prev: AuthActionResult,
+  formData: FormData,
+): Promise<AuthActionResult> {
   const email = String(formData.get('email') ?? '').toLowerCase().trim();
   const password = String(formData.get('password') ?? '');
   if (!(await rateLimit('login', `${await clientIp()}:${email}`, 10, 60))) {

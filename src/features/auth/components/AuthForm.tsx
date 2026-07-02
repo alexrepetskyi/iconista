@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { loginAction, registerAction } from '@/features/auth/actions';
@@ -8,23 +8,20 @@ import { loginAction, registerAction } from '@/features/auth/actions';
 export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
   const t = useTranslations('auth');
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  // useActionState so the form POSTs to the server action even before
+  // hydration — a native pre-hydration submit must never GET credentials.
+  const [state, formAction, pending] = useActionState(
+    mode === 'login' ? loginAction : registerAction,
+    null,
+  );
+  const error = state && !state.ok ? state.error : null;
 
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    startTransition(async () => {
-      const action = mode === 'login' ? loginAction : registerAction;
-      const result = await action(formData);
-      if (result.ok) {
-        router.push('/account');
-        router.refresh();
-      } else {
-        setError(result.error);
-      }
-    });
-  };
+  useEffect(() => {
+    if (state?.ok) {
+      router.push('/account');
+      router.refresh();
+    }
+  }, [state, router]);
 
   return (
     <div style={{ width: '100%', maxWidth: 400 }}>
@@ -48,7 +45,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
         <span style={{ flex: 1, height: 1, background: 'var(--line)' }} />
       </div>
 
-      <form onSubmit={submit} style={{ display: 'grid', gap: 14 }}>
+      <form action={formAction} style={{ display: 'grid', gap: 14 }}>
         {mode === 'register' ? (
           <input name="name" placeholder={t('name')} className="field" autoComplete="name" />
         ) : null}
