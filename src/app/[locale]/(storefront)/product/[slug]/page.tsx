@@ -4,6 +4,7 @@ import { Link } from '@/i18n/routing';
 import { isLocale, defaultLocale, type Locale } from '@/i18n/locales';
 import { getProductBySlug } from '@/features/products/queries';
 import { ProductActions } from '@/features/products/components/ProductActions';
+import { ProductGallery } from '@/features/products/components/ProductGallery';
 import { formatEur } from '@/lib/money';
 
 export const dynamic = 'force-dynamic';
@@ -39,54 +40,12 @@ export default async function ProductPage({
         alignItems: 'start',
       }}
     >
-      {/* gallery */}
-      <div style={{ display: 'grid', gap: 16 }}>
-        {(product.images.length ? product.images : [null]).map((image, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'relative',
-              aspectRatio: '4 / 5',
-              background: 'var(--card-bg)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden',
-            }}
-          >
-            {image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={image}
-                alt={`${product.brand} ${product.title} — ${i + 1}`}
-                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              <span style={{ fontWeight: 200, fontSize: 14, color: 'var(--ink-32)' }}>
-                {product.brand} · {product.title}
-              </span>
-            )}
-            {i === 0 && save ? (
-              <span
-                style={{
-                  position: 'absolute',
-                  top: 16,
-                  left: 16,
-                  fontSize: 10,
-                  fontWeight: 600,
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  background: 'var(--ink)',
-                  color: 'var(--cream)',
-                  padding: '6px 11px',
-                }}
-              >
-                {t('save', { amount: formatEur(save) })}
-              </span>
-            ) : null}
-          </div>
-        ))}
-      </div>
+      {/* gallery: main frame + thumbnail rail */}
+      <ProductGallery
+        images={product.images}
+        alt={`${product.brand} · ${product.title}`}
+        badge={save ? t('save', { amount: formatEur(save) }) : null}
+      />
 
       {/* details */}
       <div className="sticky-col" style={{ position: 'sticky', top: 32 }}>

@@ -13,9 +13,19 @@ export function ProductCard({ product }: { product: ProductView }) {
       ? product.compareAtPrice - product.price
       : null;
 
+  // Sold pieces are history — the card stays visible but leads nowhere.
+  const Wrapper = ({ children }: { children: React.ReactNode }) =>
+    gone ? (
+      <div style={{ display: 'block', cursor: 'default' }}>{children}</div>
+    ) : (
+      <Link href={`/product/${product.slug}`} style={{ display: 'block' }}>
+        {children}
+      </Link>
+    );
+
   return (
     <article style={{ opacity: gone ? 0.55 : 1 }}>
-      <Link href={`/product/${product.slug}`} style={{ display: 'block' }}>
+      <Wrapper>
         <div
           style={{
             position: 'relative',
@@ -115,7 +125,7 @@ export function ProductCard({ product }: { product: ProductView }) {
             </span>
           ) : null}
         </div>
-      </Link>
+      </Wrapper>
     </article>
   );
 }

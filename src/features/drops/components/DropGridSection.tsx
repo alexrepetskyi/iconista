@@ -67,21 +67,40 @@ export async function DropGridSection({ drop }: { drop: DropView }) {
         </span>
       </div>
 
-      <div
-        className="scrollx"
-        style={{
-          display: 'grid',
-          gridAutoFlow: 'column',
-          gridAutoColumns: 'minmax(300px, 1fr)',
-          gap: 24,
-          overflowX: 'auto',
-          paddingBottom: 8,
-        }}
-      >
-        {drop.products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {drop.status === 'closed' ? (
+        // Archive drop: quiet wrapped grid of small cards (auto-fill keeps
+        // card width stable even when the drop has few pieces).
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            maxWidth: drop.products.length < 4 ? drop.products.length * 280 : undefined,
+            gap: 24,
+          }}
+        >
+          {drop.products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      ) : (
+        // Live drop: the design's horizontal rail; width capped so a drop
+        // with 1–2 pieces doesn't balloon into wall-sized cards.
+        <div
+          className="scrollx"
+          style={{
+            display: 'grid',
+            gridAutoFlow: 'column',
+            gridAutoColumns: 'minmax(280px, 380px)',
+            gap: 24,
+            overflowX: 'auto',
+            paddingBottom: 8,
+          }}
+        >
+          {drop.products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
