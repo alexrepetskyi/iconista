@@ -13,6 +13,14 @@ const envSchema = z.object({
   RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
   EMAIL_FROM: z.string().min(1, 'EMAIL_FROM is required'),
   ANTHROPIC_API_KEY: z.string().min(1, 'ANTHROPIC_API_KEY is required'),
+  AWS_ACCESS_KEY_ID: z.string().min(1, 'AWS_ACCESS_KEY_ID is required'),
+  AWS_SECRET_ACCESS_KEY: z.string().min(1, 'AWS_SECRET_ACCESS_KEY is required'),
+  AWS_REGION: z.string().default('us-east-1'),
+  AWS_BUCKET_NAME: z.string().min(1, 'AWS_BUCKET_NAME is required'),
+  /** Shown when neither the live drop nor any past drop has a hero video. */
+  HERO_VIDEO_FALLBACK_URL: z.string().default(''),
+  /** 'mock' completes purchases locally without Stripe (dev/test only). */
+  PAYMENT_MODE: z.enum(['stripe', 'mock']).default('stripe'),
 });
 
 export type Env = z.infer<typeof envSchema>;

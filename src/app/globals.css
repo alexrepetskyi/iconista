@@ -213,6 +213,87 @@ details[open] .faq-plus {
   margin-top: 8px;
 }
 
+/* ---------- rich text (WYSIWYG output) ---------- */
+
+.prose {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.75;
+  color: #4d463a;
+}
+
+.prose p {
+  margin: 0 0 14px;
+}
+
+.prose h2,
+.prose h3 {
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 22px 0 10px;
+}
+
+.prose h2 {
+  font-size: 19px;
+}
+
+.prose h3 {
+  font-size: 16px;
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 14px;
+  padding-left: 22px;
+}
+
+.prose li {
+  margin-bottom: 6px;
+}
+
+.prose blockquote {
+  border-left: 2px solid var(--gold);
+  padding-left: 16px;
+  margin: 16px 0;
+  font-style: italic;
+  color: var(--stone);
+}
+
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose strong,
+.prose b {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.rte-area:empty::before {
+  content: attr(data-placeholder);
+  color: #b0a893;
+  pointer-events: none;
+}
+
+.rte-area h2,
+.rte-area h3 {
+  font-weight: 700;
+  margin: 12px 0 8px;
+}
+
+.rte-area ul,
+.rte-area ol {
+  padding-left: 22px;
+}
+
+.rte-area blockquote {
+  border-left: 2px solid var(--gold);
+  padding-left: 12px;
+  color: var(--stone);
+}
+
 /* ---------- layout ---------- */
 
 .container {
@@ -224,5 +305,14 @@ details[open] .faq-plus {
   .container {
     padding-left: 20px;
     padding-right: 20px;
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-split {
+    grid-template-columns: 1fr !important;
+  }
+  .admin-split aside {
+    position: static !important;
   }
 }

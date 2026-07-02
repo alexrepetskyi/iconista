@@ -12,6 +12,13 @@ import { PromoCode } from '@/models/PromoCode';
 import { User } from '@/models/User';
 import { Subscriber } from '@/models/Subscriber';
 import { invalidateLiveDropCache } from '@/features/drops/queries';
+import {
+  publishDropLive,
+  moveProductToDrop,
+  remainingCapacity,
+  MAX_PIECES_PER_DROP,
+} from '@/features/drops/lifecycle';
+import { sanitizeDescription } from '@/features/products/sanitize';
 import { translateContent } from '@/features/translations/translate';
 import { runBackfill } from '@/features/translations/backfill';
 import {
@@ -74,7 +81,17 @@ export async function createDrop(
 export async function setDropStatus(dropId: string, status: 'draft' | 'live' | 'closed'): Promise<AdminResult> {
   await requireAdmin();
   await connectDb();
-  const drop = await Drop.findByIdAndUpdate(dropId, { $set: { status } }, { new: true });
+
+  let drop;
+  if (status === 'live') {
+    // Exclusive: archives the previous live drop, inherits the latest hero
+    // video when this drop has none.
+    const published = await publishDropLive(dropId);
+    if (!published.ok) return { ok: false, error: 'Drop not found' };
+    drop = await Drop.findById(dropId);
+  } else {
+    drop = await Drop.findByIdAndUpdate(dropId, { $set: { status } }, { new: true });
+  }
   if (!drop) return { ok: false, error: 'Drop not found' };
   await invalidateLiveDropCache();
   revalidatePath('/', 'layout');
@@ -107,7 +124,8 @@ export async function createProduct(
   const dropId = String(formData.get('dropId'));
   const brand = String(formData.get('brand') ?? '').trim();
   const title = String(formData.get('title') ?? '').trim();
-  const description = String(formData.get('description') ?? '').trim();
+  // WYSIWYG HTML — sanitized to a strict allowlist before it touches the DB.
+  const description = sanitizeDescription(String(formData.get('description') ?? ''));
   const price = Math.round(Number(formData.get('price')) * 100);
   const compareAtRaw = Number(formData.get('compareAtPrice'));
   const compareAtPrice = compareAtRaw > 0 ? Math.round(compareAtRaw * 100) : undefined;
@@ -116,6 +134,9 @@ export async function createProduct(
     return { ok: false, error: 'Fill brand, title and price.' };
   }
   if (!(await Drop.exists({ _id: dropId }))) return { ok: false, error: 'Drop not found' };
+  if ((await remainingCapacity(dropId)) < 1) {
+    return { ok: false, error: `A drop holds at most ${MAX_PIECES_PER_DROP} pieces.` };
+  }
 
   const images: string[] = [];
   for (const file of formData.getAll('images')) {
@@ -148,6 +169,24 @@ export async function createProduct(
   await invalidateLiveDropCache();
   revalidatePath('/', 'layout');
   return { ok: true, id: String(product._id) };
+}
+
+/** Moves an unsold piece from an archived drop into a draft/live one. */
+export async function movePieceToDrop(productId: string, targetDropId: string): Promise<AdminResult> {
+  await requireAdmin();
+  const result = await moveProductToDrop(productId, targetDropId);
+  if (!result.ok) {
+    const message: Record<string, string> = {
+      not_found: 'Piece or drop not found.',
+      sold: 'Sold pieces are history — they never move.',
+      target_closed: 'Cannot move into a closed drop.',
+      target_full: `A drop holds at most ${MAX_PIECES_PER_DROP} pieces.`,
+    };
+    return { ok: false, error: message[result.error] ?? result.error };
+  }
+  await invalidateLiveDropCache();
+  revalidatePath('/', 'layout');
+  return { ok: true };
 }
 
 export async function deleteProduct(productId: string): Promise<AdminResult> {

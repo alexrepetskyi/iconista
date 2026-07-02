@@ -4,6 +4,7 @@ import { isLocale, defaultLocale, type Locale } from '@/i18n/locales';
 import { getLiveDrop, getArchiveDrops } from '@/features/drops/queries';
 import { DropGridSection } from '@/features/drops/components/DropGridSection';
 import { NewsletterForm } from '@/features/newsletter/components/NewsletterForm';
+import { env } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +33,8 @@ export default async function HomePage({
 
   const number = drop ? String(drop.number).padStart(3, '0') : null;
   const nextNumber = String((drop?.number ?? 7) + 1).padStart(3, '0');
+  // Drop video → (inherited on publish) → env fallback → animated gradient.
+  const heroVideo = drop?.heroVideoUrl || env().HERO_VIDEO_FALLBACK_URL;
 
   return (
     <>
@@ -45,9 +48,9 @@ export default async function HomePage({
           background: 'var(--ink)',
         }}
       >
-        {drop?.heroVideoUrl ? (
+        {heroVideo ? (
           <video
-            src={drop.heroVideoUrl}
+            src={heroVideo}
             autoPlay
             muted
             loop

@@ -127,9 +127,12 @@ export default async function ProductPage({
         </div>
 
         {product.description ? (
-          <p style={{ marginTop: 26, fontSize: 14, fontWeight: 300, lineHeight: 1.75, color: '#4d463a', maxWidth: 460 }}>
-            {product.description}
-          </p>
+          <div
+            className="prose"
+            style={{ marginTop: 26, maxWidth: 460 }}
+            // sanitized on save with a strict allowlist (features/products/sanitize.ts)
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          />
         ) : null}
 
         <div style={{ marginTop: 34 }}>

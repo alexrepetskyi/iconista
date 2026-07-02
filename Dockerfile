@@ -18,8 +18,6 @@ RUN addgroup -S app && adduser -S app -G app
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
-RUN mkdir -p uploads && chown app:app uploads
 USER app
 EXPOSE 3000
-VOLUME ["/app/uploads"]
 CMD ["node", "server.js"]

@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState, useTransition } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/routing';
 import { loadStripe } from '@stripe/stripe-js';
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js';
 import { startCheckout } from '@/features/checkout/actions';
@@ -32,6 +33,7 @@ const PROMO_ERROR_KEYS: Record<string, string> = {
 export function CheckoutClient({ items: initialItems }: { items: CheckoutItem[] }) {
   const t = useTranslations('checkout');
   const locale = useLocale() as Locale;
+  const router = useRouter();
 
   const [items, setItems] = useState(initialItems);
   const [promoInput, setPromoInput] = useState('');
@@ -65,6 +67,11 @@ export function CheckoutClient({ items: initialItems }: { items: CheckoutItem[] 
         setTakenTitles(null);
         const result = await startCheckout(ids, promo?.code ?? null, locale);
         if (result.ok) {
+          if ('mock' in result) {
+            // PAYMENT_MODE=mock — the order is already fulfilled server-side.
+            router.push(`/checkout/result?session_id=${result.sessionId}`);
+            return;
+          }
           setClientSecret(result.clientSecret);
           return;
         }

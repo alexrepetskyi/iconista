@@ -20,7 +20,12 @@ export default async function CheckoutResultPage({
   const t = await getTranslations('checkout');
 
   let paid = false;
-  if (sessionId) {
+  if (sessionId?.startsWith('mock_')) {
+    // PAYMENT_MODE=mock — the order was fulfilled synchronously; verify in Mongo.
+    const { Order } = await import('@/models/Order');
+    await connectDb();
+    paid = (await Order.exists({ stripeSessionId: sessionId, status: 'paid' })) !== null;
+  } else if (sessionId) {
     try {
       const session = await getStripe().checkout.sessions.retrieve(sessionId);
       paid = session.payment_status === 'paid';

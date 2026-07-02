@@ -39,6 +39,8 @@ export async function translateContent(
       system:
         'You translate luxury e-commerce product copy. Keep the tone refined and concise. ' +
         `Never translate brand or model names: ${GLOSSARY}. ` +
+        'Field values may contain HTML — keep every tag and attribute exactly as-is and ' +
+        'translate only the human-readable text. ' +
         'Reply with JSON only, no code fences, no commentary.',
       messages: [
         {

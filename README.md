@@ -15,6 +15,7 @@ Design spec: `docs/superpowers/specs/2026-07-01-iconista-dropshop-design.md`
 - **Auth.js v5** — Google OAuth + email/password (argon2), guest cart merge on login
 - **Resend + React Email** — order/shipping/refund emails, double opt-in newsletter
 - **next-intl + Claude API** — UI dictionaries per locale; product content translated by LLM on admin save
+- **S3** — product photos are streamed to S3 (`src/lib/s3.ts`) and served back through `/uploads/<key>`; the bucket stays private
 
 ## Run locally
 
@@ -24,11 +25,21 @@ npm install
 npm run dev             # http://localhost:3000
 ```
 
-Stripe webhooks in dev:
+### Payments in dev
+
+Two modes via `PAYMENT_MODE`:
+
+- `mock` — no Stripe at all: "Pay" runs the exact same fulfillment code the webhook
+  uses (order `paid`, piece `sold`, promo consumed, cart cleared) against a synthetic
+  session. Ideal for day-to-day local work. **Never in production.**
+- `stripe` (default) — real Stripe test mode; forward webhooks locally:
 
 ```bash
 stripe listen --forward-to localhost:3000/api/webhooks/stripe
 ```
+
+Before going live, always run the full flow once in `stripe` mode with test cards
+(4242 4242 4242 4242) — mock mode cannot catch Stripe-side issues.
 
 ## Admin access
 
@@ -40,8 +51,11 @@ MONGODB_URI=... npx tsx scripts/make-admin.ts your@email.com
 
 Sign out and back in — the role is baked into the session token.
 
-Admin lives at `/admin`: create a drop → add pieces (photos, prices) → publish.
-Publishing emails all confirmed newsletter subscribers.
+Admin lives at `/admin`: create a drop → add pieces (photos, prices, rich-text description) → publish.
+Drop rules: going live automatically archives the previous drop and its pieces; a drop holds
+at most 10 pieces; unsold pieces of an archived drop can be moved into the next one; a drop
+published without a hero video inherits the latest one. Publishing emails all confirmed
+newsletter subscribers.
 
 ## Adding a language
 
@@ -62,7 +76,7 @@ npm run typecheck
 
 ```bash
 docker build -t iconista .
-docker run -d --env-file .env -p 3000:3000 -v iconista-uploads:/app/uploads iconista
+docker run -d --env-file .env -p 3000:3000 iconista
 ```
 
 Put Caddy/nginx with TLS in front. Point the Stripe webhook at `https://<domain>/api/webhooks/stripe`

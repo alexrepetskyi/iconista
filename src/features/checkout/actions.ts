@@ -1,5 +1,6 @@
 'use server';
 
+import crypto from 'node:crypto';
 import { connectDb } from '@/lib/mongodb';
 import { getRedis } from '@/lib/redis';
 import { getStripe } from '@/lib/stripe';
@@ -21,6 +22,8 @@ const EU_COUNTRIES = [
 
 export type StartCheckoutResult =
   | { ok: true; clientSecret: string }
+  /** PAYMENT_MODE=mock — the order is already fulfilled, go to the result page. */
+  | { ok: true; mock: true; sessionId: string }
   | { ok: false; error: 'empty' | 'all_taken' | 'promo_error'; promoError?: string }
   | { ok: false; error: 'items_taken'; takenTitles: string[]; remainingIds: string[] };
 
@@ -106,8 +109,43 @@ export async function startCheckout(
     appliedCode = normalized;
   }
 
-  const stripe = getStripe();
   const base = env().NEXT_PUBLIC_BASE_URL;
+
+  const metadata = {
+    ownerId,
+    userId: user?.id ?? '',
+    productIds: lineProducts.map((p) => String(p._id)).join(','),
+    promoCode: appliedCode ?? '',
+    subtotal: String(subtotal),
+    discount: String(discount),
+    locale,
+  };
+
+  // Local dev without Stripe: run the SAME fulfillment path the webhook
+  // uses, against a synthetic session. Guarded by env, never for prod.
+  if (env().PAYMENT_MODE === 'mock') {
+    const { fulfillCheckoutSession } = await import('@/features/orders/fulfill');
+    const { Cart } = await import('@/models/Cart');
+    const sessionId = `mock_${crypto.randomUUID()}`;
+    await fulfillCheckoutSession({
+      id: sessionId,
+      metadata,
+      customer_details: { email: user?.email ?? 'guest@local.test' },
+      customer_email: user?.email ?? 'guest@local.test',
+      amount_total: subtotal - discount,
+      payment_intent: `pi_${sessionId}`,
+      collected_information: null,
+    } as never);
+    const filter = ownerId.startsWith('u:')
+      ? { userId: ownerId.slice(2) }
+      : { sessionId: ownerId.slice(2) };
+    await Cart.findOneAndUpdate(filter, {
+      $pull: { productIds: { $in: lineProducts.map((p) => p._id) } },
+    });
+    return { ok: true, mock: true, sessionId };
+  }
+
+  const stripe = getStripe();
 
   const session = await stripe.checkout.sessions.create({
     ui_mode: 'embedded',
@@ -143,15 +181,7 @@ export async function startCheckout(
     shipping_address_collection: { allowed_countries: [...EU_COUNTRIES] },
     ...(user?.email ? { customer_email: user.email } : {}),
     return_url: `${base}/${locale}/checkout/result?session_id={CHECKOUT_SESSION_ID}`,
-    metadata: {
-      ownerId,
-      userId: user?.id ?? '',
-      productIds: lineProducts.map((p) => String(p._id)).join(','),
-      promoCode: appliedCode ?? '',
-      subtotal: String(subtotal),
-      discount: String(discount),
-      locale,
-    },
+    metadata,
   });
 
   return { ok: true, clientSecret: session.client_secret! };

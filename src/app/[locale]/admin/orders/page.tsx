@@ -1,15 +1,29 @@
 import { connectDb } from '@/lib/mongodb';
 import { Order } from '@/models/Order';
 import { AdminForm, AdminButton } from '@/features/admin/components/AdminForm';
+import { Pagination, ADMIN_PAGE_SIZE, parsePage } from '@/features/admin/components/Pagination';
 import { markOrderShipped, markOrderDelivered } from '@/features/admin/actions';
 import { orderNumber } from '@/features/orders/fulfill';
 import { formatEur } from '@/lib/money';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminOrdersPage() {
+export default async function AdminOrdersPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const [{ locale }, { page: rawPage }] = await Promise.all([params, searchParams]);
+  const page = parsePage(rawPage);
+
   await connectDb();
-  const orders = await Order.find().sort({ createdAt: -1 }).limit(200);
+  const total = await Order.countDocuments();
+  const orders = await Order.find()
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * ADMIN_PAGE_SIZE)
+    .limit(ADMIN_PAGE_SIZE);
 
   return (
     <div>
@@ -83,6 +97,7 @@ export default async function AdminOrdersPage() {
         })}
         {orders.length === 0 ? <p style={{ color: 'var(--stone)', fontWeight: 300 }}>No orders yet.</p> : null}
       </div>
+      <Pagination page={page} total={total} basePath={`/${locale}/admin/orders`} />
     </div>
   );
 }
