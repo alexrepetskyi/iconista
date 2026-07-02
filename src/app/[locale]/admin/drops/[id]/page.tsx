@@ -165,10 +165,22 @@ export default async function AdminDropDetailPage({
                     </div>
                   </div>
                   {product.status !== 'sold' ? (
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: 8,
+                        alignItems: 'center',
+                        flexWrap: 'nowrap',
+                        marginLeft: 'auto',
+                      }}
+                    >
                       {openDrops.length > 0 ? (
-                        <AdminForm action={moveAction} submitLabel="Move" resetOnSuccess={false}>
-                          <select name="target" className="field" style={{ padding: '8px 10px', fontSize: 12 }}>
+                        <AdminForm action={moveAction} submitLabel="Move" resetOnSuccess={false} inline>
+                          <select
+                            name="target"
+                            className="field"
+                            style={{ padding: '9px 10px', fontSize: 12, width: 'auto', minWidth: 150 }}
+                          >
                             {openDrops.map((target) => (
                               <option key={String(target._id)} value={String(target._id)}>
                                 → Drop {String(target.number).padStart(3, '0')} ({target.status})

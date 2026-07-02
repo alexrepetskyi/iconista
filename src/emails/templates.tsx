@@ -107,16 +107,32 @@ export function OrderConfirmedEmail(props: OrderEmailProps) {
 export function OrderShippedEmail({
   orderNumber,
   trackingNumber,
+  carrier,
+  trackingUrl,
 }: {
   orderNumber: string;
   trackingNumber: string;
+  carrier?: string;
+  trackingUrl?: string;
 }) {
   return (
     <BaseLayout preview="Your ICONISTA order has shipped" title={`Order ${orderNumber} — shipped`}>
       <Text style={emailText}>
-        Your order is on its way, fully insured. Tracking number:{' '}
-        <strong>{trackingNumber}</strong>
+        Your order is on its way, fully insured.
+        {carrier ? (
+          <>
+            {' '}Delivery is handled by <strong>{carrier}</strong>.
+          </>
+        ) : null}
       </Text>
+      <Text style={emailText}>
+        Tracking number: <strong>{trackingNumber}</strong>
+      </Text>
+      {trackingUrl ? (
+        <Button href={trackingUrl} style={emailButton}>
+          Track your order
+        </Button>
+      ) : null}
     </BaseLayout>
   );
 }

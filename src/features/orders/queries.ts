@@ -14,6 +14,8 @@ export interface OrderView {
   promoCode: string | null;
   total: number;
   trackingNumber: string | null;
+  carrier: string | null;
+  trackingUrl: string | null;
 }
 
 export function toOrderView(order: OrderDoc): OrderView {
@@ -33,6 +35,8 @@ export function toOrderView(order: OrderDoc): OrderView {
     promoCode: order.promoCode ?? null,
     total: order.total,
     trackingNumber: order.trackingNumber ?? null,
+    carrier: order.carrier ?? null,
+    trackingUrl: order.trackingUrl ?? null,
   };
 }
 

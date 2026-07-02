@@ -203,20 +203,36 @@ export async function deleteProduct(productId: string): Promise<AdminResult> {
 
 /* ---------------- orders ---------------- */
 
-export async function markOrderShipped(orderId: string, trackingNumber: string): Promise<AdminResult> {
+export async function markOrderShipped(
+  orderId: string,
+  shipping: { trackingNumber: string; carrier: string; trackingUrl: string },
+): Promise<AdminResult> {
   await requireAdmin();
+
+  const trackingNumber = shipping.trackingNumber.trim();
+  const carrier = shipping.carrier.trim();
+  const trackingUrl = shipping.trackingUrl.trim();
+  if (!trackingNumber) return { ok: false, error: 'Tracking number is required.' };
+  if (trackingUrl && !/^https?:\/\//.test(trackingUrl)) {
+    return { ok: false, error: 'Tracking link must start with http(s)://' };
+  }
+
   await connectDb();
   const order = await Order.findOneAndUpdate(
     { _id: orderId, status: 'paid' },
     {
-      $set: { status: 'shipped', trackingNumber: trackingNumber.trim() },
+      $set: { status: 'shipped', trackingNumber, carrier, trackingUrl },
       $push: { timeline: { status: 'shipped', at: new Date() } },
     },
     { new: true },
   );
   if (!order) return { ok: false, error: 'Order not found or not in "paid" state.' };
   try {
-    await sendOrderShippedEmail(order.email, orderNumber(order), order.trackingNumber ?? '');
+    await sendOrderShippedEmail(order.email, orderNumber(order), {
+      trackingNumber,
+      carrier: carrier || undefined,
+      trackingUrl: trackingUrl || undefined,
+    });
   } catch (err) {
     console.error('shipped email failed', err);
   }

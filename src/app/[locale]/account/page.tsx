@@ -100,7 +100,24 @@ export default async function AccountPage({
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14, fontSize: 14, flexWrap: 'wrap', gap: 8 }}>
                   <span className="label-xs" style={{ color: 'var(--stone)' }}>
-                    {order.trackingNumber ? `${t('tracking')}: ${order.trackingNumber}` : null}
+                    {order.trackingNumber ? (
+                      <>
+                        {order.carrier ? `${order.carrier} · ` : ''}
+                        {t('tracking')}:{' '}
+                        {order.trackingUrl ? (
+                          <a
+                            href={order.trackingUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ textDecoration: 'underline', color: 'var(--ink)' }}
+                          >
+                            {order.trackingNumber}
+                          </a>
+                        ) : (
+                          order.trackingNumber
+                        )}
+                      </>
+                    ) : null}
                   </span>
                   <span>
                     {order.discount > 0 ? (

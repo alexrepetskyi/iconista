@@ -33,6 +33,9 @@ const orderSchema = new Schema(
     paymentIntentId: { type: String, index: true, sparse: true },
     shippingAddress: { type: Schema.Types.Mixed },
     trackingNumber: { type: String },
+    /** Who ships the parcel (e.g. DHL) and where the customer can track it. */
+    carrier: { type: String },
+    trackingUrl: { type: String },
     timeline: {
       type: [
         new Schema(

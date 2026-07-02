@@ -15,11 +15,14 @@ export function AdminForm({
   submitLabel,
   children,
   resetOnSuccess = true,
+  inline = false,
 }: {
   action: FormAction;
   submitLabel: string;
   children: React.ReactNode;
   resetOnSuccess?: boolean;
+  /** Single-row form: fields, button and status share one line. */
+  inline?: boolean;
 }) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
@@ -32,18 +35,43 @@ export function AdminForm({
     }
   }, [state, resetOnSuccess, router]);
 
+  const status = state ? (
+    <span className={state.ok ? 'form-ok' : 'form-error'} style={{ marginTop: 0 }}>
+      {state.ok ? (state.id ? `Done: ${state.id}` : 'Done') : state.error}
+    </span>
+  ) : null;
+
+  const submit = (
+    <button
+      type="submit"
+      disabled={pending}
+      className="btn btn-dark"
+      style={inline ? { padding: '10px 18px', fontSize: 11, flexShrink: 0 } : undefined}
+    >
+      {submitLabel}
+    </button>
+  );
+
+  if (inline) {
+    return (
+      <form
+        ref={formRef}
+        action={formAction}
+        style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}
+      >
+        {children}
+        {submit}
+        {status}
+      </form>
+    );
+  }
+
   return (
     <form ref={formRef} action={formAction} style={{ display: 'grid', gap: 12 }}>
       {children}
       <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-        <button type="submit" disabled={pending} className="btn btn-dark">
-          {submitLabel}
-        </button>
-        {state ? (
-          <span className={state.ok ? 'form-ok' : 'form-error'} style={{ marginTop: 0 }}>
-            {state.ok ? (state.id ? `Done: ${state.id}` : 'Done') : state.error}
-          </span>
-        ) : null}
+        {submit}
+        {status}
       </div>
     </form>
   );

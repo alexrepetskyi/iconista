@@ -50,12 +50,17 @@ export async function sendOrderConfirmedEmail(
 export async function sendOrderShippedEmail(
   to: string,
   orderNumber: string,
-  trackingNumber: string,
+  shipping: { trackingNumber: string; carrier?: string; trackingUrl?: string },
 ): Promise<void> {
   await send(
     to,
     `Order ${orderNumber} — shipped`,
-    <OrderShippedEmail orderNumber={orderNumber} trackingNumber={trackingNumber} />,
+    <OrderShippedEmail
+      orderNumber={orderNumber}
+      trackingNumber={shipping.trackingNumber}
+      carrier={shipping.carrier}
+      trackingUrl={shipping.trackingUrl}
+    />,
   );
 }
 
