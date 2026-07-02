@@ -60,7 +60,8 @@
     "description": "Every past drop, on record. Each piece was one-of-one — once a drop closes it never returns.",
     "soldOut": "Sold out",
     "pieces": "{count} pieces",
-    "viewAll": "View all {count} past drops"
+    "viewAll": "View all {count} past drops",
+    "viewDrop": "View drop"
   },
   "reviews": {
     "title": "Our customers say it better",

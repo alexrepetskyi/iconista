@@ -316,51 +316,32 @@ export default async function HomePage({
           </p>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: 24,
-          }}
-        >
-          {archive.slice(0, 3).map((past) => (
-            <Link
-              key={past.slug}
-              href={`/drop/${past.slug}`}
-              style={{
-                position: 'relative',
-                background:
-                  'radial-gradient(120% 120% at 70% 20%, var(--dark-1) 0%, var(--dark-2) 55%, var(--dark-3) 100%)',
-                color: 'var(--cream)',
-                aspectRatio: '16 / 10',
-                padding: 24,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <span style={{ fontWeight: 800, fontSize: 44 }}>
-                  {String(past.number).padStart(3, '0')}
-                </span>
-                <span
-                  className="label-xs"
-                  style={{ border: '1px solid rgba(243,237,226,0.4)', padding: '5px 10px' }}
-                >
-                  {tArchive('soldOut')}
-                </span>
-              </div>
-              <div>
-                <div className="label-xs" style={{ color: 'var(--cream-55)', marginBottom: 8 }}>
+        <div>
+          {archive.slice(0, 4).map((past) => (
+            <Link key={past.slug} href={`/drop/${past.slug}`} className="archive-row">
+              <span style={{ fontWeight: 200, fontSize: 34, lineHeight: 1, letterSpacing: '-0.02em' }}>
+                {String(past.number).padStart(3, '0')}
+              </span>
+              <span>
+                <span style={{ display: 'block', fontWeight: 500, fontSize: 16 }}>{past.title}</span>
+                <span className="label-xs" style={{ color: 'var(--stone)', display: 'block', marginTop: 5 }}>
                   {new Date(past.closesAt).toLocaleDateString('en-GB', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric',
                   })}{' '}
                   · {tArchive('pieces', { count: past.pieceCount })}
-                </div>
-                <div style={{ fontWeight: 400, fontSize: 17 }}>{past.title}</div>
-              </div>
+                </span>
+              </span>
+              <span
+                className="label-xs"
+                style={{ border: '1px solid var(--line)', color: 'var(--stone)', padding: '5px 10px' }}
+              >
+                {tArchive('soldOut')}
+              </span>
+              <span className="archive-arrow" style={{ fontWeight: 200, fontSize: 22, color: 'var(--bronze)' }}>
+                →
+              </span>
             </Link>
           ))}
         </div>

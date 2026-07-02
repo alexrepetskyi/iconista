@@ -427,3 +427,32 @@ details[open] .faq-plus {
   border-top: 1px solid var(--line);
   margin: 18px 0;
 }
+
+/* Archive strip rows (home) */
+.archive-row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto auto;
+  align-items: center;
+  gap: 24px;
+  padding: 22px 8px;
+  border-top: 1px solid var(--line);
+  transition: background 0.15s ease;
+}
+
+.archive-row:hover {
+  background: rgba(21, 17, 11, 0.04);
+}
+
+.archive-row:last-of-type {
+  border-bottom: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+  .archive-row {
+    grid-template-columns: 64px 1fr auto;
+    gap: 14px;
+  }
+  .archive-row .archive-arrow {
+    display: none;
+  }
+}

@@ -31,8 +31,8 @@ export default async function ArchivePage({
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: 24,
+          gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+          gap: 20,
         }}
       >
         {archive.map((past) => (
@@ -40,30 +40,27 @@ export default async function ArchivePage({
             key={past.slug}
             href={`/drop/${past.slug}`}
             style={{
-              position: 'relative',
-              background:
-                'radial-gradient(120% 120% at 70% 20%, var(--dark-1) 0%, var(--dark-2) 55%, var(--dark-3) 100%)',
-              color: 'var(--cream)',
-              aspectRatio: '16 / 10',
-              padding: 24,
+              background: '#fff',
+              padding: '26px 24px',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between',
+              gap: 18,
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <span style={{ fontWeight: 800, fontSize: 44 }}>
+              <span style={{ fontWeight: 200, fontSize: 40, lineHeight: 1, letterSpacing: '-0.02em' }}>
                 {String(past.number).padStart(3, '0')}
               </span>
               <span
                 className="label-xs"
-                style={{ border: '1px solid rgba(243,237,226,0.4)', padding: '5px 10px' }}
+                style={{ border: '1px solid var(--line)', color: 'var(--stone)', padding: '5px 10px' }}
               >
                 {t('soldOut')}
               </span>
             </div>
             <div>
-              <div className="label-xs" style={{ color: 'var(--cream-55)', marginBottom: 8 }}>
+              <div style={{ fontWeight: 500, fontSize: 16 }}>{past.title}</div>
+              <div className="label-xs" style={{ color: 'var(--stone)', marginTop: 6 }}>
                 {new Date(past.closesAt).toLocaleDateString('en-GB', {
                   day: 'numeric',
                   month: 'long',
@@ -71,8 +68,10 @@ export default async function ArchivePage({
                 })}{' '}
                 · {t('pieces', { count: past.pieceCount })}
               </div>
-              <div style={{ fontWeight: 400, fontSize: 17 }}>{past.title}</div>
             </div>
+            <span className="label-xs" style={{ color: 'var(--bronze)', marginTop: 'auto' }}>
+              {t('viewDrop')} →
+            </span>
           </Link>
         ))}
       </div>
