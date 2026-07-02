@@ -32,7 +32,7 @@ export default async function AccountPage({
       <SiteHeader />
       <main
         className="container"
-        style={{ padding: '72px 40px 120px', maxWidth: 860, margin: '0 auto', minHeight: '50vh' }}
+        style={{ paddingTop: 72, paddingBottom: 120, maxWidth: 860, margin: '0 auto', minHeight: '50vh' }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 16 }}>
           <h1 style={{ fontWeight: 800, fontSize: 'clamp(30px, 3.6vw, 48px)' }}>{t('title')}</h1>

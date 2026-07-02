@@ -87,11 +87,11 @@ export default async function HomePage({
         />
 
         <div
+          className="hero-pad"
           style={{
             position: 'absolute',
             left: 0,
             bottom: 0,
-            padding: '48px 40px',
             color: 'var(--cream)',
             maxWidth: 1100,
           }}
@@ -157,6 +157,7 @@ export default async function HomePage({
         </div>
 
         <div
+          className="hero-cue"
           style={{
             position: 'absolute',
             right: 40,
@@ -184,14 +185,14 @@ export default async function HomePage({
       {/* ---------- 100% AUTHENTIC ---------- */}
       <section
         id="authenticity"
+        className="split container"
         style={{
           background: 'var(--ink)',
           color: 'var(--cream)',
-          display: 'grid',
-          gridTemplateColumns: 'minmax(280px, 1fr) minmax(280px, 1fr)',
           gap: 40,
           alignItems: 'center',
-          padding: '90px 40px',
+          paddingTop: 90,
+          paddingBottom: 90,
         }}
       >
         <div style={{ fontWeight: 800, fontSize: 'clamp(80px, 12vw, 170px)', lineHeight: 0.9 }}>
@@ -221,13 +222,13 @@ export default async function HomePage({
       {/* ---------- ABOUT ---------- */}
       <section
         id="about"
-        className="container"
+        className="split container"
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(300px, 1.1fr) minmax(280px, 0.9fr)',
+          ['--split-cols' as string]: '1.1fr 0.9fr',
           gap: 56,
           alignItems: 'center',
-          padding: '96px 40px',
+          paddingTop: 96,
+          paddingBottom: 96,
         }}
       >
         <div>
@@ -289,7 +290,7 @@ export default async function HomePage({
       </section>
 
       {/* ---------- ARCHIVE ---------- */}
-      <section id="archive" className="container" style={{ padding: '20px 40px 90px' }}>
+      <section id="archive" className="container" style={{ paddingTop: 20, paddingBottom: 90 }}>
         <div
           style={{
             display: 'flex',
@@ -372,7 +373,7 @@ export default async function HomePage({
       </section>
 
       {/* ---------- REVIEWS ---------- */}
-      <section id="reviews" className="container" style={{ padding: '0 40px 90px' }}>
+      <section id="reviews" className="container" style={{ paddingBottom: 90 }}>
         <div
           style={{
             display: 'flex',
@@ -427,12 +428,11 @@ export default async function HomePage({
       {/* ---------- FAQ ---------- */}
       <section
         id="faq"
-        className="container"
+        className="split container"
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(220px, 0.7fr) minmax(300px, 1.3fr)',
+          ['--split-cols' as string]: '0.7fr 1.3fr',
           gap: 48,
-          padding: '0 40px 90px',
+          paddingBottom: 90,
         }}
       >
         <div>

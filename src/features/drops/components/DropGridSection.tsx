@@ -10,7 +10,7 @@ export async function DropGridSection({ drop }: { drop: DropView }) {
   const number = String(drop.number).padStart(3, '0');
 
   return (
-    <section className="container" style={{ padding: '84px 40px 70px' }} id="drop">
+    <section className="container" style={{ paddingTop: 84, paddingBottom: 70 }} id="drop">
       <div
         style={{
           display: 'flex',

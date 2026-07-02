@@ -23,7 +23,7 @@ export default async function CartPage({
   ]);
 
   return (
-    <section className="container" style={{ padding: '72px 40px 90px', maxWidth: 860, margin: '0 auto' }}>
+    <section className="container" style={{ paddingTop: 72, paddingBottom: 90, maxWidth: 860, margin: '0 auto' }}>
       <h1 style={{ fontWeight: 800, fontSize: 'clamp(30px, 3.6vw, 48px)', marginBottom: 36 }}>
         {t('title')}
       </h1>

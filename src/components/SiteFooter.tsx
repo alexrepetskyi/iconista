@@ -22,15 +22,7 @@ export async function SiteFooter() {
 
   return (
     <footer style={{ background: 'var(--ink)', color: 'var(--cream)' }}>
-      <div
-        className="container"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(260px, 1.4fr) repeat(3, minmax(140px, 1fr))',
-          gap: 40,
-          padding: '72px 40px 48px',
-        }}
-      >
+      <div className="footer-grid">
         <div>
           <div style={{ fontWeight: 800, fontSize: 34, letterSpacing: '0.18em' }}>ICONISTA</div>
           <p
@@ -74,7 +66,8 @@ export async function SiteFooter() {
           alignItems: 'center',
           gap: 20,
           flexWrap: 'wrap',
-          padding: '20px 40px',
+          paddingTop: 20,
+          paddingBottom: 20,
           borderTop: '1px solid rgba(243,237,226,0.14)',
           fontSize: 11,
           fontWeight: 300,

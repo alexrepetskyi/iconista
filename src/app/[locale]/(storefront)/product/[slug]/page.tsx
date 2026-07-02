@@ -30,12 +30,12 @@ export default async function ProductPage({
 
   return (
     <section
-      className="container"
+      className="split container"
       style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(300px, 1.1fr) minmax(300px, 0.9fr)',
+        ['--split-cols' as string]: '1.1fr 0.9fr',
         gap: 56,
-        padding: '56px 40px 90px',
+        paddingTop: 56,
+        paddingBottom: 90,
         alignItems: 'start',
       }}
     >
@@ -89,7 +89,7 @@ export default async function ProductPage({
       </div>
 
       {/* details */}
-      <div style={{ position: 'sticky', top: 32 }}>
+      <div className="sticky-col" style={{ position: 'sticky', top: 32 }}>
         <Link
           href={`/drop/${product.drop.slug}`}
           className="label-sm"

@@ -17,7 +17,7 @@ export default async function ArchivePage({
   const [archive, t] = await Promise.all([getArchiveDrops(locale), getTranslations('archive')]);
 
   return (
-    <section className="container" style={{ padding: '72px 40px 90px' }}>
+    <section className="container" style={{ paddingTop: 72, paddingBottom: 90 }}>
       <div className="label" style={{ color: 'var(--bronze)', marginBottom: 14 }}>
         {t('label')}
       </div>

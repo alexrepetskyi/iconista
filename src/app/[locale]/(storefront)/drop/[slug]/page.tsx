@@ -20,7 +20,7 @@ export default async function DropPage({
 
   return (
     <>
-      <section className="container" style={{ padding: '56px 40px 0' }}>
+      <section className="container" style={{ paddingTop: 56 }}>
         {drop.title ? (
           <p style={{ fontWeight: 200, fontSize: 'clamp(18px, 2vw, 24px)', color: 'var(--stone)' }}>
             {drop.title}

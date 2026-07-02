@@ -91,15 +91,17 @@ export default async function AdminDropDetailPage({
               <AdminForm action={boundCreateProduct} submitLabel="Add piece">
                 <input name="brand" placeholder="Brand (e.g. Chanel)" className="field" required />
                 <input name="title" placeholder="Title" className="field" required />
-                <label className="label-xs" style={{ color: 'var(--stone)', display: 'block' }}>
-                  Description
+                {/* not a <label>: a label forwards clicks to its form control
+                    and steals focus from the contentEditable editor */}
+                <div>
+                  <div className="label-xs" style={{ color: 'var(--stone)' }}>Description</div>
                   <div style={{ marginTop: 6 }}>
                     <RichTextEditor
                       name="description"
                       placeholder="Condition, materials, hardware, what's included…"
                     />
                   </div>
-                </label>
+                </div>
                 <div style={{ display: 'flex', gap: 12 }}>
                   <input name="price" type="number" step="0.01" min="1" placeholder="Price €" className="field" required />
                   <input name="compareAtPrice" type="number" step="0.01" min="0" placeholder="Compare-at €" className="field" />

@@ -7,7 +7,7 @@ import sanitizeHtml from 'sanitize-html';
 export function sanitizeDescription(html: string): string {
   return sanitizeHtml(html, {
     allowedTags: [
-      'p', 'br', 'strong', 'b', 'em', 'i', 'u',
+      'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'strike', 'del', 'hr',
       'h2', 'h3', 'ul', 'ol', 'li', 'blockquote', 'a',
     ],
     allowedAttributes: { a: ['href'] },

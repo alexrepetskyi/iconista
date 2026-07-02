@@ -37,7 +37,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <Link href="/" style={{ ...link, color: 'var(--stone)' }}>← Storefront</Link>
         </nav>
       </header>
-      <main className="container" style={{ padding: '40px 40px 100px', maxWidth: 1080, margin: '0 auto' }}>
+      <main className="container" style={{ paddingTop: 40, paddingBottom: 100, maxWidth: 1080, margin: '0 auto' }}>
         {children}
       </main>
     </div>

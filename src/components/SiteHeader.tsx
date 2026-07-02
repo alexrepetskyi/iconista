@@ -18,19 +18,8 @@ export async function SiteHeader() {
   } as const;
 
   return (
-    <header
-      style={{
-        position: 'relative',
-        zIndex: 5,
-        display: 'grid',
-        gridTemplateColumns: '1fr auto 1fr',
-        alignItems: 'center',
-        padding: '24px 40px',
-        borderBottom: '1px solid var(--line)',
-        background: 'var(--cream)',
-      }}
-    >
-      <nav style={navStyle}>
+    <header className="site-header">
+      <nav className="site-nav" style={navStyle}>
         <Link href="/" style={{ fontWeight: 600 }}>
           {t('thisDrop')}
         </Link>
@@ -40,12 +29,13 @@ export async function SiteHeader() {
 
       <Link
         href="/"
+        className="site-logo"
         style={{ fontWeight: 800, fontSize: 21, letterSpacing: '0.24em', paddingLeft: '0.24em' }}
       >
         ICONISTA
       </Link>
 
-      <div style={{ ...navStyle, gap: 26, justifyContent: 'flex-end', alignItems: 'center' }}>
+      <div className="site-actions" style={{ ...navStyle, gap: 26, justifyContent: 'flex-end', alignItems: 'center' }}>
         {user?.role === 'admin' ? <Link href="/admin">{t('admin')}</Link> : null}
         <Link href={user ? '/account' : '/login'}>{user ? t('account') : t('signIn')}</Link>
         <Link href="/cart">

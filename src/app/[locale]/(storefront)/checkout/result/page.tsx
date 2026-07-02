@@ -47,7 +47,7 @@ export default async function CheckoutResultPage({
   return (
     <section
       className="container"
-      style={{ padding: '96px 40px 120px', maxWidth: 640, margin: '0 auto', textAlign: 'center' }}
+      style={{ paddingTop: 96, paddingBottom: 120, maxWidth: 640, margin: '0 auto', textAlign: 'center' }}
     >
       {paid ? (
         <>
